@@ -4,6 +4,9 @@
 ; and print the result to the console screen
 ; DEPENDENCIES:  getn, printn
 ;
+; TODO: Not working with double digit numbers as input.
+; TODO: Always returning that a number is not prime. Something is wrong with
+; the modulus comparison.
 ; Start Program
 .ORIG x3000
 ; Clear the registers
@@ -25,34 +28,33 @@ GETINPUT
 	LD R1, GETNUM
 	JSRR R1
 	ADD R1, R1, #1
-		BRN INPUTERROR ; If the input returns -1 from GETNUM, outputs an error
-		BRZ INPUTERROR ; If the input returns 0 from GETNUM, outputs an error
+		BRNZ INPUTERROR ; If input returns -1 or 0 from GETNUM, outputs error
 	ADD R3, R3, R0
 	LD R1, PRINTNUM ; Print the number to the console screen
 	JSRR R1
 ; 
-; Check if n is <= 4
-	ADD R5, R3, #-4
-		BRN ISPRIMENUM ; If the number is less than four, it is a prime num.
-		BRZP SETINCREMENTNUM ; If the number is 4 or greater, move on.
+; Check if n is <= 1
+	ADD R5, R3, #-1
+		BRNZ ISPRIMENUM ; If the number is one it is not prime.
+		BRP SETDIVISOR ; If the number is greater than one, move on.
 ;
-; SETINCREMENTNUM sets the i value. This is the number that we will divide by
+; SETDIVISOR sets the i value. This is the number that we will divide by
 ; that increments.
-SETINCREMENTNUM
-	ADD R4, R3, #2 ; Sets i = 2
+SETDIVISOR
+	ADD R4, R4, #2
 ;
 LOOP
 	AND R0, R0, #0
 	AND R1, R1, #0
 	ADD R0, R3, #0
 	ADD R1, R4, #0
-	LD R2, DIVIDE
+	LD R2, DIVIDE ; R0 is the result, R1 is the remainder
 	JSRR R2
 	ADD R1, R1, #0 ; Check if % == 0
-		BRz ISPRIMENUM
-		ADD R4, R4, #1 ; i++
-		ADD R4, R2, #-1 ; check if i >= n 
-			BRz NOTPRIMENUM
+		BRZ NOTPRIMENUM
+		ADD R4, R4, #1 ; Update divisor(i)
+		ADD R4, R4, R0 ; check if divisor(i) is equal to n  
+			BRZ ISPRIMENUM
 			BR LOOP
 ;
 ;----------------------------------------------------------------
@@ -97,6 +99,6 @@ PRINTNUM
 GETNUM
 	.FILL x4300
 DIVIDE
-	.FILL x5200
+	.FILL x5100
 ;
 .END
