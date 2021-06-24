@@ -9,7 +9,7 @@
 ; returns -2 if there are invalid characters
 ; DEPENDENCIES: multiply
 
-	.ORIG x4200
+.ORIG x4200
 	BR string2num
 SaveR1	.fill #0
 SaveR2	.FILL #0
